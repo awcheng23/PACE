@@ -8,7 +8,7 @@ from scipy import signal
 record = wfdb.rdrecord('./data/mitdb/100')
 
 # Extract the ECG signal from the record
-ecg_signal = record.p_signal[:,0]
+ecg_signal = record.p_signal[:,1]
 
 # Apply a bandpass filter to remove noise
 lowcut = 0.5
