@@ -2,6 +2,11 @@ import wfdb
 import numpy as np
 from scipy import signal
 
+"""
+Author: Alice, Josue N Rivera
+Date: 8/22/2023
+"""
+
 # Read record numbers
 with open('./data/mitdb/RECORDS') as f:
     pat_ids = f.readlines()
