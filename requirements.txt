@@ -3,5 +3,4 @@ wfdb
 numpy
 torch
 torchvision
-
 scipy
