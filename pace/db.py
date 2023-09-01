@@ -4,7 +4,7 @@ import torch as th
 from torch.utils.data import Dataset
 
 """
-Author: Alice, Josue N Rivera
+Author: Alice Cheng, Josue N Rivera
 Date: 8/22/2023
 """
 
