@@ -82,6 +82,8 @@ def main():
             segments.append(normalized_ecg_signal[loc[i]-dist:loc[i]+dist])
             beat_types.append(reduced[beat_type[i]])
 
+    print("Completed data load")
+
     # Padding
     max_len = len(segments[0])
     for segment in segments:
@@ -91,11 +93,17 @@ def main():
         arr = np.zeros(max_len - len(segments[i]))
         segments[i] = np.concatenate((segments[i], arr))
 
+    print("Completed padding")
+
     # Produce scalogram in parallel
     segments = cwt_parallel(segments)
 
+    print("Completed cwt")
+
     segments = np.array(segments)
     np.savez("./data/db.npz", segments=segments, labels=beat_types)
+
+    print("Completed file save")
 
 if __name__ == '__main__':
     main()
