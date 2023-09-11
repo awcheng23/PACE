@@ -30,5 +30,5 @@ class ArrhythmiaDatabase(Dataset):
         return self.segments[idx], self.labels[idx]
 
 if __name__ == "__main__":
-    dt = ArrhythmiaDatabase()
+    dt = ArrhythmiaDatabase("data/db_25.npz")
     temp = dt[1]
