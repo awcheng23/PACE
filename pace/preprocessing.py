@@ -76,7 +76,7 @@ def main():
                 continue
             
             dist = round(min(loc[i]-loc[i-1], loc[i+1]-loc[i])*0.8)
-            if dist * 2 < 100:
+            if dist * 2 < 100 or dist * 2 > 1000:
                 continue
 
             segments.append(normalized_ecg_signal[loc[i]-dist:loc[i]+dist])
