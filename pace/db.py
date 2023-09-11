@@ -11,12 +11,12 @@ Date: 8/22/2023
 class ArrhythmiaDatabase(Dataset):
 
     def __init__(self, 
-                 path:str = "../data/db.npz") -> None:
+                 path:str = "data/db.npz") -> None:
         super().__init__()
 
         npzfile = np.load(path)
-        segments = npzfile.segments
-        labels = npzfile.labels
+        segments = npzfile["segments"]
+        labels = npzfile["labels"]
         self.n = len(segments)
 
         self.segments = th.tensor(segments)
