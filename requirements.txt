@@ -1,6 +1,6 @@
-mitbih_processor
 wfdb
 numpy
 torch
 torchvision
 scipy
+matplotlib
