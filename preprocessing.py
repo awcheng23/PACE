@@ -1,7 +1,4 @@
-import wfdb
 import numpy as np
-import scipy as spy
-from multiprocessing import Pool
 from pace.db import get_patients_beats, cwt_parallel, padd_scalograms
 from pace import PATIENT_IDS
 

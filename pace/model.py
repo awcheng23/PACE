@@ -1,6 +1,5 @@
 import torch as th
 import torch.nn as nn
-from math import floor
 
 """
 Author: Alice Cheng, Josue N Rivera
