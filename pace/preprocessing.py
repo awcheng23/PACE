@@ -9,13 +9,13 @@ Date: 8/22/2023
 """
 
 # Define a function to compute cwt for a single segment
-widths = np.arange(1, 41)
+widths = np.arange(1, 31)
 def cwt_single_segment(segment):
     return spy.signal.cwt(segment, spy.signal.ricker, widths)
 
 def cwt_parallel(segments):
         # Create a pool of worker processes
-        pool = Pool()
+        pool = Pool(2)
 
         # Compute cwt for each segment in parallel
         cwt_data = pool.map(cwt_single_segment, segments)
@@ -25,7 +25,7 @@ def cwt_parallel(segments):
         pool.join()
 
         # Return the result as a 3D array
-        return np.array(cwt_data)
+        return cwt_data
 
 def main():
     # Read record numbers
@@ -36,12 +36,13 @@ def main():
         pat_ids[i] = int(pat_ids[i])
 
     # Categorize beat classes
-    classes_reduced = {0:['N','L','R','e','j'], 1:['S','A','a','J'], 2:['V','E'], 3:['F'], 4:['/','Q','f']}
-    reduced = {}
+    ID_to_beat = {0:['N','L','R','e','j'], 1:['S','A','a','J'], 2:['V','E'], 3:['F'], 4:['/','Q','f']}
 
-    for key, values in classes_reduced.items():
-        for value in values:
-            reduced[value] = key
+    beat_to_ID = {}
+
+    for ID, beats in ID_to_beat.items():
+        for beat in beats:
+            beat_to_ID[beat] = ID
 
     segments = []
     beat_types = []
@@ -80,28 +81,26 @@ def main():
                 continue
 
             segments.append(normalized_ecg_signal[loc[i]-dist:loc[i]+dist])
-            beat_types.append(reduced[beat_type[i]])
+            beat_types.append(beat_to_ID[beat_type[i]])
 
     print("Completed data load")
 
-    # Padding
-    max_len = len(segments[0])
-    for segment in segments:
-        max_len = max(len(segment), max_len)
-
-    for i in range(0, len(segments)):
-        arr = np.zeros(max_len - len(segments[i]))
-        segments[i] = np.concatenate((segments[i], arr))
-
-    print("Completed padding")
-
     # Produce scalogram in parallel
-    segments = cwt_parallel(segments)
+    scalograms = cwt_parallel(segments)
 
     print("Completed cwt")
 
-    segments = np.array(segments)
-    np.savez("./data/db.npz", segments=segments, labels=beat_types)
+    # Padding
+    max_len = max([scalogram.shape[1] for scalogram in scalograms])
+   
+    for i in range(0, len(scalograms)):
+        padding = ((0,0), (0,max_len-scalograms[i].shape[1]))
+        scalograms[i] = np.pad(scalograms[i], pad_width=padding, mode='constant', constant_values=0)
+
+    print("Completed padding")
+
+    scalograms = np.array(scalograms)
+    np.savez("./data/db.npz", scalograms=scalograms, labels=beat_types)
 
     print("Completed file save")
 
