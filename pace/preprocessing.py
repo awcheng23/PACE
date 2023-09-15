@@ -100,8 +100,8 @@ def main():
 
     print("Completed cwt")
 
-    segments = np.array(segments)
-    np.savez("./data/db.npz", segments=segments, labels=beat_types)
+    scalograms = np.array(segments)
+    np.savez("./data/db.npz", scalograms=scalograms, labels=beat_types)
 
     print("Completed file save")
 

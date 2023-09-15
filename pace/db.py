@@ -16,11 +16,11 @@ class ArrhythmiaDatabase(Dataset):
         super().__init__()
 
         npzfile = np.load(path)
-        segments = npzfile["segments"]
+        scalograms = npzfile["scalograms"]
         labels = npzfile["labels"]
-        self.n = len(segments)
+        self.n = len(labels)
 
-        self.segments = th.tensor(segments)
+        self.scalograms = th.tensor(scalograms)
         self.labels = th.tensor(labels)
 
     def __len__(self) -> int:
