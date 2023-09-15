@@ -8,7 +8,7 @@ import numpy as np
 import scipy as spy
 from multiprocessing import Pool
 from os.path import join as join_path
-# from pace import ID_to_beat, beat_to_ID
+from pace import BEAT_TO_ID
 
 """
 Author: Alice Cheng, Josue N Rivera
@@ -16,12 +16,6 @@ Date: 8/22/2023
 """
 
 valid_types = ['N','L','R','e','j','S','A','a','J','V','E','/','Q','f'] # Classified beats
-ID_to_beat = {0:['N','L','R','e','j'], 1:['S','A','a','J'], 2:['V','E'], 3:['F'], 4:['/','Q','f']}
-
-beat_to_ID = {}
-for ID, beats in ID_to_beat.items():
-    for beat in beats:
-        beat_to_ID[beat] = ID
 
 def get_record(ID:int, dt_path: str = 'data/mitdb/'):
 
@@ -82,7 +76,7 @@ def segment_signal_relative(signal:np.ndarray,
             continue
 
         beats.append(signal[loc[i]-dist:loc[i]+dist])
-        beat_IDs.append(beat_to_ID[beat_type[i]])
+        beat_IDs.append(BEAT_TO_ID[beat_type[i]])
 
     return beats, beat_IDs
 

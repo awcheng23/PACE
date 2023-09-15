@@ -13,7 +13,7 @@ def main():
     widths = np.arange(1, 31)
     data_path = 'data/mitdb/'
 
-    for id in PATIENT_IDS:
+    for id in PATIENT_IDS[0:1]:
         pat_beats, pat_beat_ID = get_patients_beats(ID=id, dt_path=data_path)
 
         beats.extend(pat_beats)
