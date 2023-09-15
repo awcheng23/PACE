@@ -28,7 +28,7 @@ def main():
     print("Completed padding")
 
     scalograms = np.array(scalograms)
-    np.savez("data/db_31p.npz", scalograms=scalograms, labels=beat_IDs)
+    np.savez("data/db.npz", scalograms=scalograms, labels=beat_IDs)
     print("Completed file save")
 
 if __name__ == '__main__':
