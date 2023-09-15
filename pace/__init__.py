@@ -7,5 +7,5 @@ PATIENT_IDS = [100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 111, 112, 113, 
 BEAT_TO_ID = {}
 
 for ID, beats in ID_TO_BEAT.items():
-        for beat in beats:
-            BEAT_TO_ID[beat] = ID
+    for beat in beats:
+        BEAT_TO_ID[beat] = ID
