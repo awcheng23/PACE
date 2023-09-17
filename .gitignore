@@ -1,10 +1,10 @@
 mit_data
-.venv
 mit-bih-arrhythmia-database-*
 data
 
 .rug_*
 .vscode
+output.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

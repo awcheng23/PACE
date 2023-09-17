@@ -24,11 +24,11 @@ def main():
     scalograms = cwt_parallel(beats=beats, widths=widths)
     print("Completed cwt")
 
-    scalograms = padd_scalograms(scalograms)
+    scalograms = padd_scalograms(scalograms, 966)
     print("Completed padding")
 
     scalograms = np.array(scalograms)
-    np.savez_compressed("data/db_compressed.npz", scalograms=scalograms, labels=beat_IDs)
+    np.savez_compressed("data/db.npz", scalograms=scalograms, labels=beat_IDs)
     print("Completed file save")
 
 if __name__ == '__main__':

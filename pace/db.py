@@ -164,17 +164,17 @@ class ArrhythmiaDatabase(Dataset):
                  path:str = "data/db.npz") -> None:
         super().__init__()
 
-        npzfile = np.load(path)
+        npzfile = np.load(path, mmap_mode='r')
         scalograms = npzfile["scalograms"]
         labels = npzfile["labels"]
         self.n = len(labels)
 
-        self.scalograms = th.tensor(scalograms)
-        self.labels = th.tensor(labels)
+        self.scalograms = th.tensor(scalograms, dtype=th.double).unsqueeze(1)
+        self.labels = th.tensor(labels, dtype=th.long)
 
     def __len__(self) -> int:
         return self.n 
 
     def __getitem__(self, 
                     idx: int) -> Tuple[th.Tensor, th.Tensor]:
-        return self.segments[idx], self.labels[idx]   
+        return self.scalograms[idx], self.labels[idx]   
