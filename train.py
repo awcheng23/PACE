@@ -10,10 +10,11 @@ Date: 9/1/2023
 """
 
 dt = db.Database("data/db.npz")
-batch_size = 4
+batch_size = 10
 trainloader = th.utils.data.DataLoader(dt, batch_size=batch_size, shuffle=True, num_workers=2)
+device = th.device('cuda' if th.cuda.is_available() else 'cpu')
 
-model = md.Pace()
+model = md.Pace().to(device=device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
@@ -28,8 +29,8 @@ for epoch in range(2):  # loop over the dataset multiple times
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
+        outputs = model(inputs.to(device))
+        loss = criterion(outputs, labels.to(device=device))
         loss.backward()
         optimizer.step()
 
