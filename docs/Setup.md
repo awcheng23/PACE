@@ -49,5 +49,5 @@ python preprocess.py
 2. Execute script
 
 ```bash
-python train.py
+python train.py > output.txt
 ```
