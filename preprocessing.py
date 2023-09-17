@@ -13,7 +13,7 @@ def main():
     widths = np.arange(1, 31)
     data_path = 'data/mitdb/'
 
-    for id in PATIENT_IDS[0:1]:
+    for id in PATIENT_IDS:
         pat_beats, pat_beat_ID = get_patients_beats(ID=id, dt_path=data_path)
 
         beats.extend(pat_beats)
@@ -28,7 +28,7 @@ def main():
     print("Completed padding")
 
     scalograms = np.array(scalograms)
-    np.savez("data/db.npz", scalograms=scalograms, labels=beat_IDs)
+    np.savez_compressed("data/db.npz", scalograms=scalograms, labels=beat_IDs)
     print("Completed file save")
 
 if __name__ == '__main__':
