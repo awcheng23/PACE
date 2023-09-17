@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ## Download dataset
 
 1. Download zip file from [official source](https://www.physionet.org/static/published-projects/mitdb/mit-bih-arrhythmia-database-1.0.0.zip)
-2. Unzip folder
+2. Unzip folder and make inside the project
 3. Rename and move dataset
 
 ```bash
