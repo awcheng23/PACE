@@ -50,3 +50,4 @@ def main():
     th.save(checkpoint, 'data/models/pace31.pth')
 if __name__ == '__main__':
     main()
+    

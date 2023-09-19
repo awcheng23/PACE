@@ -19,7 +19,7 @@ valid_types = ['N','L','R','e','j','S','A','a','J','V','E','/','Q','f'] # Classi
 
 def get_record(ID:int, dt_path: str = 'data/mitdb/'):
 
-    """ Obtain a patient record """
+    """Obtain a patient record"""
 
     path = join_path(dt_path, f'{ID}')
     record = wfdb.rdrecord(path)
@@ -31,7 +31,7 @@ def get_bandpass_filter_signal(record:wfdb.Record,
         lowcut:float = 0.5,
         highcut:float = 45.0) -> np.ndarray:
     
-    """ Apply a bandpass filter to remove noise and get signal"""
+    """Apply a bandpass filter to remove noise and get signal"""
 
     ecg_signal = record.p_signal[:,0]
     fs = record.fs
@@ -80,10 +80,10 @@ def segment_signal_relative(signal:np.ndarray,
 
     return beats, beat_IDs
 
-def padd_scalograms(scalograms:Union[list, np.ndarray], max_length: Optional[int] = None):
-    """Padd scalograms to the same size"""
+def pad_scalograms(scalograms:Union[list, np.ndarray], max_length: Optional[int] = None):
 
-    # Padding
+    """Pad scalograms to the same size"""
+
     scalograms = [scalograms] if type(scalograms) == np.ndarray else scalograms
 
     max_length = max([scalogram.shape[1] for scalogram in scalograms]) \
@@ -96,11 +96,13 @@ def padd_scalograms(scalograms:Union[list, np.ndarray], max_length: Optional[int
     return scalograms
     
 def cwt_single_beat(beat: np.ndarray, widths: np.ndarray) -> np.ndarray:
+
     """Create a single scalogram"""
 
     return spy.signal.cwt(beat, spy.signal.ricker, widths)
     
 def _cwt_single_beat(args):
+
     """Create a single scalogram"""
 
     beat, widths = args
@@ -142,7 +144,7 @@ def get_scalogram_from_beat(beat: np.ndarray,
     
     scalogram = cwt_single_beat(beat=beat, widths=widths)
 
-    return padd_scalograms(scalogram=scalogram, max_length=max_length)[0]
+    return pad_scalograms(scalogram=scalogram, max_length=max_length)[0]
 
 def get_scalograms_from_signal(signal:np.ndarray, 
                                annotation: wfdb.Annotation,
@@ -156,7 +158,7 @@ def get_scalograms_from_signal(signal:np.ndarray,
     beats, beat_IDs = segment_signal_relative(signal=signal, annotation=annotation)
     scalograms = cwt_parallel(beats=beats, widths=widths, processes=processes)
 
-    return padd_scalograms(scalograms=scalograms, max_length=max_length), beat_IDs
+    return pad_scalograms(scalograms=scalograms, max_length=max_length), beat_IDs
 
 class ArrhythmiaDatabase(Dataset):
 

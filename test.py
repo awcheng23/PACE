@@ -1,7 +1,7 @@
 import numpy as np
 import torch as th
 import torch.nn as nn
-from pace.db import get_patients_beats, cwt_parallel, padd_scalograms
+from pace.db import get_patients_beats, cwt_parallel, pad_scalograms
 import pace.model as md
 
 """
@@ -18,7 +18,7 @@ def main():
 
     pat_beats, pat_beat_ID = get_patients_beats(ID=103, dt_path='data/mitdb/')
     scalograms = cwt_parallel(beats=pat_beats, widths=np.arange(1, 31))
-    scalograms = np.array(padd_scalograms(scalograms, 966))
+    scalograms = np.array(pad_scalograms(scalograms, 966))
     pat_beat_ID = th.tensor(pat_beat_ID)
 
     losses = []
@@ -37,3 +37,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

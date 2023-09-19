@@ -1,5 +1,5 @@
 import numpy as np
-from pace.db import get_patients_beats, cwt_parallel, padd_scalograms
+from pace.db import get_patients_beats, cwt_parallel, pad_scalograms
 from pace import PATIENT_IDS
 
 """
@@ -13,7 +13,7 @@ def main():
     widths = np.arange(1, 31)
     data_path = 'data/mitdb/'
 
-    for id in PATIENT_IDS:
+    for id in PATIENT_IDS: # take out patients for testing
         pat_beats, pat_beat_ID = get_patients_beats(ID=id, dt_path=data_path)
 
         beats.extend(pat_beats)
@@ -21,10 +21,12 @@ def main():
 
     print("Completed data load")
 
+    # sampling
+
     scalograms = cwt_parallel(beats=beats, widths=widths)
     print("Completed cwt")
 
-    scalograms = padd_scalograms(scalograms, 966)
+    scalograms = pad_scalograms(scalograms, 966)
     print("Completed padding")
 
     scalograms = np.array(scalograms)
@@ -33,3 +35,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
