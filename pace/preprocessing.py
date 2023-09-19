@@ -8,28 +8,30 @@ Author: Alice Cheng, Josue N Rivera
 Date: 8/22/2023
 """
 
-# Define a function to compute cwt for a single segment
+path = 'data/mitdb/'
 widths = np.arange(1, 31)
+
+# Define a function to compute cwt for a single segment
 def cwt_single_segment(segment):
     return spy.signal.cwt(segment, spy.signal.ricker, widths)
 
 def cwt_parallel(segments):
-        # Create a pool of worker processes
-        pool = Pool(2)
+    # Create a pool of worker processes
+    pool = Pool(2)
 
-        # Compute cwt for each segment in parallel
-        cwt_data = pool.map(cwt_single_segment, segments)
+    # Compute cwt for each segment in parallel
+    cwt_data = pool.map(cwt_single_segment, segments)
 
-        # Close the pool and wait for all processes to finish
-        pool.close()
-        pool.join()
+    # Close the pool and wait for all processes to finish
+    pool.close()
+    pool.join()
 
-        # Return the result as a 3D array
-        return cwt_data
+    # Return the result as a 3D array
+    return cwt_data
 
 def main():
     # Read record numbers
-    with open('./data/mitdb/RECORDS') as f:
+    with open(f'{path}RECORDS') as f:
         pat_ids = f.readlines()
 
     for i in range(0, len(pat_ids)):
@@ -50,7 +52,7 @@ def main():
 
     for id in pat_ids:
         # Extract the ECG signal from the record
-        record = wfdb.rdrecord(f'./data/mitdb/{id}')
+        record = wfdb.rdrecord(f'{path}{id}')
         ecg_signal = record.p_signal[:,0]
 
         # Apply a bandpass filter to remove noise
@@ -68,7 +70,7 @@ def main():
         normalized_ecg_signal = (filtered_ecg_signal - min_signal) / (max_signal - min_signal)
 
         # Segment using relative minimum RR-interval
-        annotation = wfdb.rdann(f'./data/mitdb/{id}', 'atr')
+        annotation = wfdb.rdann(f'{path}{id}', 'atr')
         loc = annotation.sample
         beat_type = annotation.symbol
 
@@ -100,7 +102,7 @@ def main():
     print("Completed padding")
 
     scalograms = np.array(scalograms)
-    np.savez("./data/db.npz", scalograms=scalograms, labels=beat_types)
+    np.savez("data/db.npz", scalograms=scalograms, labels=beat_types)
 
     print("Completed file save")
 
