@@ -15,7 +15,7 @@ Author: Alice Cheng, Josue N Rivera
 Date: 8/22/2023
 """
 
-valid_types = ['N','L','R','e','j','S','A','a','J','V','E','/','Q','f'] # Classified beats
+valid_types = ['N','L','R','e','j','S','A','a','J','V','E','F','/','Q','f'] # Classified beats
 
 def get_record(ID:int, dt_path: str = 'data/mitdb/'):
 
