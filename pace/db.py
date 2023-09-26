@@ -136,8 +136,9 @@ def get_patients_beats(ID:int, dt_path: str = 'data/mitdb/') -> Tuple[List[np.nd
 
     return beats, beat_IDs
 
-def uniform_sampling(beats, beat_IDs: Tuple[List[np.ndarray], List[int]], 
-                   num_samples:int = 2763) -> Tuple[List[np.ndarray], List[int]]:
+def uniform_sampling(beats: List[np.ndarray],
+                     beat_IDs: List[int], 
+                     num_samples:int = 2763) -> Tuple[List[np.ndarray], List[int]]:
     
     """Sample uniformly from each beat class"""
 
