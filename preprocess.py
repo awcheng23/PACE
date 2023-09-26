@@ -21,13 +21,31 @@ def main():
 
     print("Completed data load")
 
-    # sampling
+    # label distribution dist
+    dist={}
+
+    # split training and test per lab (e.g., 80% 20%); dict for each dataset
+
+    training_dist = {}
+    test_dist = {}
+    for key in dist:
+        split = int(len(dist['key'])*0.8)
+        training_dist[key] = dist['key'][:split]
+        test_dist[key] = dist['key'][split:]
+
+    # uniform fold training
+    training_dist
+
+    # cap each label
+    test_dist
 
     scalograms = cwt_parallel(beats=beats, widths=widths)
     print("Completed cwt")
 
     scalograms = pad_scalograms(scalograms, 966)
     print("Completed padding")
+
+
 
     scalograms = np.array(scalograms)
     np.savez_compressed("data/db.npz", scalograms=scalograms, labels=beat_IDs)
