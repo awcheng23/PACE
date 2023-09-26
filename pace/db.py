@@ -136,6 +136,32 @@ def get_patients_beats(ID:int, dt_path: str = 'data/mitdb/') -> Tuple[List[np.nd
 
     return beats, beat_IDs
 
+def uniform_sampling(beats, beat_IDs: Tuple[List[np.ndarray], List[int]], 
+                   num_samples:int = 2763) -> Tuple[List[np.ndarray], List[int]]:
+    
+    """Sample uniformly from each beat class"""
+
+    # Note the indexes of each ID
+    id_split = {0:[],1:[],2:[],3:[],4:[]}
+
+    for i in range(len(beat_IDs)):
+        id_split[beat_IDs[i]].append(i)
+
+    # Take a sample of the indexes 
+    samples = []
+    for id in id_split:
+        id_len = len(id_split[id])
+        if id_len < num_samples: # Duplicate if there are not enough in the original ID
+            id_split[id] = id_split[id] * int(np.ceil(num_samples/id_len))
+        samp = np.random.choice(id_split[id], num_samples, replace=False)
+        samples.extend(samp)
+
+    # Keep only the sampled indexes
+    beats_samp = [beats[i] for i in samples]
+    beat_IDs_samp = [beat_IDs[i] for i in samples]
+
+    return beats_samp, beat_IDs_samp
+
 def get_scalogram_from_beat(beat: np.ndarray,
                             widths: np.ndarray,
                             max_length: Optional[int] = None):
