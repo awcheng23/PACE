@@ -142,8 +142,11 @@ def uniform_sampling(beats: List[np.ndarray],
     
     """Sample uniformly from each beat class"""
 
-    # Note the indexes of each ID
-    id_split = {0:[],1:[],2:[],3:[],4:[]}
+    # Form distribution list for each beat class
+    id_split = {}
+    beat_IDs_unique = list(set(beat_IDs))
+    for id in beat_IDs_unique:
+        id_split[id] = []
 
     for i in range(len(beat_IDs)):
         id_split[beat_IDs[i]].append(i)
