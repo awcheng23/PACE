@@ -1,5 +1,6 @@
 import torch as th
 import torch.nn as nn
+import numpy as np
 
 """
 Author: Alice Cheng, Josue N Rivera
@@ -24,8 +25,10 @@ class Pace(nn.Module):
         self.fc4 = nn.Linear(25, n_categories, dtype=th.double)
     
     def predict(self, x:th.Tensor):
-        x = x.unsqueeze(0) if len(x.shape) == 2 else x
-        return th.softmax(x, dim=1)
+        #x = x.unsqueeze(0) if len(x.shape) == 2 else x
+        #return th.softmax(x, dim=1)
+        np.set_printoptions(suppress=True, formatter={'float_kind':'{:f}'.format})
+        return th.softmax(x, dim=1).squeeze().detach().numpy()
 
     def forward(self, x:th.Tensor):
         x = self.pool(th.relu(self.conv1(x)))
