@@ -35,6 +35,7 @@ MIT-BIH beat types were grouped into the five overarching AAMI beat classes.
 > (f) Fusion of paced & normal beat  
 
 Distribution of the five main classes in the database
+
 ![beat_types](./Images/classes.png)
 
 Grouping these classes proves to be realistic as the morphologies are similar between beats under the same AAMI class.
