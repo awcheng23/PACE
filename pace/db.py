@@ -113,23 +113,39 @@ def split_train_test(dist: Dict[int, List[int]],
 
     return train_dist, test_dist
 
-def hybrid_sampling(beats: List[np.ndarray],
-                    beat_IDs: List[int],
-                    dist: Dict[int, List[int]],
-                    num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
+def hybrid_sample(beats: List[np.ndarray],
+                  beat_IDs: List[int],
+                  dist: Dict[int, List[int]],
+                  num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
     
     """Balance the number of samples of each beat type"""
 
-    # Take a sample of the indexes 
+    # Take a sample of the indices 
     samples = []
     for id in dist:
-        id_len = len(dist[id]) # use permutation to ensure each label is visited once
-        if id_len < num_samples: # Duplicate if there are not enough in the original ID
-            id_split[id] = id_split[id] * int(np.ceil(num_samples/id_len))
-        samp = np.random.choice(id_split[id], num_samples, replace=False)
-        samples.extend(samp)
+        length = len(dist[id]) # use permutation to ensure each label is visited once
+        indices = np.concatenate([np.random.permutation(length) for i in range(int(np.ceil(num_samples/length)))])[:num_samples] # hybrid
+        samples.extend(np.array(dist[id])[indices].tolist())
 
     # Keep the data and labels of the sampled indices
+    beats_samp = [beats[i] for i in samples]
+    beat_IDs_samp = [beat_IDs[i] for i in samples]
+
+    return beats_samp, beat_IDs_samp
+
+def under_sample(beats: List[np.ndarray],
+                 beat_IDs: List[int],
+                 dist: Dict[int, List[int]],
+                 num_samples: int = 800) -> Tuple[List[np.ndarray], List[int]]:
+
+    """Cap the samples of beat types with a large number of samples"""
+
+    samples = []
+    for id in dist:
+        length = len(dist[id]) # use permutation to ensure each label is visited once
+        indices = np.random.permutation(length)[:num_samples] # under
+        samples.extend(np.array(dist[id])[indices].tolist())
+
     beats_samp = [beats[i] for i in samples]
     beat_IDs_samp = [beat_IDs[i] for i in samples]
 
