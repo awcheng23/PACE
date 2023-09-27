@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List, Union
+from typing import Optional, Tuple, List, Union, Dict
 import numpy as np
 import torch as th
 from torch.utils.data import Dataset
@@ -17,7 +17,7 @@ Date: 8/22/2023
 
 valid_types = ['N','L','R','e','j','S','A','a','J','V','E','F','/','Q','f'] # Classified beats
 
-def get_record(ID:int, dt_path: str = 'data/mitdb/'):
+def get_record(ID: int, dt_path: str = 'data/mitdb/'):
 
     """Obtain a patient record"""
 
@@ -27,9 +27,9 @@ def get_record(ID:int, dt_path: str = 'data/mitdb/'):
 
     return record, annotation
 
-def get_bandpass_filter_signal(record:wfdb.Record, 
-        lowcut:float = 0.5,
-        highcut:float = 45.0) -> np.ndarray:
+def get_bandpass_filter_signal(record: wfdb.Record, 
+                               lowcut: float = 0.5,
+                               highcut: float = 45.0) -> np.ndarray:
     
     """Apply a bandpass filter to remove noise and get signal"""
 
@@ -42,9 +42,9 @@ def get_bandpass_filter_signal(record:wfdb.Record,
 
     return spy.signal.filtfilt(b, a, ecg_signal)
 
-def normalize_signal(signal:np.ndarray,
-                  min_signal:Optional[float] = None,
-                  max_signal:Optional[float] = None) -> np.ndarray:
+def normalize_signal(signal: np.ndarray,
+                     min_signal: Optional[float] = None,
+                     max_signal: Optional[float] = None) -> np.ndarray:
     
     """Normalize a signal to the range [0, 1]"""
 
@@ -53,11 +53,11 @@ def normalize_signal(signal:np.ndarray,
 
     return (signal - min_signal) / (max_signal - min_signal)
 
-def segment_signal_relative(signal:np.ndarray,
+def segment_signal_relative(signal: np.ndarray,
                             annotation: wfdb.Annotation,
-                            relative_ratio:float = 0.8,
-                            low_threshold:int = 100,
-                            high_threshold:int = 1000) -> Tuple[List[np.ndarray], List[int]]:
+                            relative_ratio: float = 0.8,
+                            low_threshold: int = 100,
+                            high_threshold: int = 1000) -> Tuple[List[np.ndarray], List[int]]:
     
     """Segment signal using relative minimum RR-interval"""
 
@@ -75,12 +75,67 @@ def segment_signal_relative(signal:np.ndarray,
         if dist * 2 < low_threshold or dist * 2 > high_threshold:
             continue
 
-        beats.append(signal[loc[i]-dist:loc[i]+dist])
+        beats.append(signal[loc[i]-dist: loc[i]+dist])
         beat_IDs.append(BEAT_TO_ID[beat_type[i]])
 
     return beats, beat_IDs
 
-def pad_scalograms(scalograms:Union[list, np.ndarray], max_length: Optional[int] = None):
+def get_label_distribution(labels: List[int]) -> Dict[int, List[int]]:
+        
+    """Get the indices of where each beat type occurs"""
+
+    unique_labels = set(labels)
+    dist = {}
+    for label in unique_labels:
+        dist[label] = []
+
+    for i in range(len(labels)):
+        dist[labels[i]].append(i)
+
+    return dist
+
+def split_train_test(dist: Dict[int, List[int]],
+                     train_size: float = 0.8) -> Tuple[Dict[int, List[int]], Dict[int, List[int]]]:
+    
+    """Split the indices of the each beat type into training and testing groups"""
+
+    train_dist = {}
+    test_dist = {}
+
+    for id in dist:
+        data_length = len(dist[id])
+        shuffle_order = np.random.permutation(data_length)
+        shuffled = np.array(dist[id])[shuffle_order]
+
+        split = int(train_size * data_length) 
+        train_dist[id] = shuffled[:split].tolist()
+        test_dist[id] = shuffled[split:].tolist()
+
+    return train_dist, test_dist
+
+def hybrid_sampling(beats: List[np.ndarray],
+                    beat_IDs: List[int],
+                    dist: Dict[int, List[int]],
+                    num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
+    
+    """Balance the number of samples of each beat type"""
+
+    # Take a sample of the indexes 
+    samples = []
+    for id in dist:
+        id_len = len(dist[id]) # use permutation to ensure each label is visited once
+        if id_len < num_samples: # Duplicate if there are not enough in the original ID
+            id_split[id] = id_split[id] * int(np.ceil(num_samples/id_len))
+        samp = np.random.choice(id_split[id], num_samples, replace=False)
+        samples.extend(samp)
+
+    # Keep the data and labels of the sampled indices
+    beats_samp = [beats[i] for i in samples]
+    beat_IDs_samp = [beat_IDs[i] for i in samples]
+
+    return beats_samp, beat_IDs_samp
+
+def pad_scalograms(scalograms: Union[list, np.ndarray], max_length: Optional[int] = None):
 
     """Pad scalograms to the same size"""
 
@@ -108,7 +163,7 @@ def _cwt_single_beat(args):
     beat, widths = args
     return spy.signal.cwt(beat, spy.signal.ricker, widths)
 
-def cwt_parallel(beats: List[np.ndarray], widths: np.ndarray, processes:int = 2) -> List[np.ndarray]:
+def cwt_parallel(beats: List[np.ndarray], widths: np.ndarray, processes: int = 2) -> List[np.ndarray]:
 
     """Create scalograms in parallel"""
 
@@ -125,7 +180,7 @@ def cwt_parallel(beats: List[np.ndarray], widths: np.ndarray, processes:int = 2)
     # Return the result as a 3D array
     return cwt_data
 
-def get_patients_beats(ID:int, dt_path: str = 'data/mitdb/') -> Tuple[List[np.ndarray], List[int]]:
+def get_patients_beats(ID: int, dt_path: str = 'data/mitdb/') -> Tuple[List[np.ndarray], List[int]]:
 
     """Get all beats for a patient"""
 
@@ -135,32 +190,6 @@ def get_patients_beats(ID:int, dt_path: str = 'data/mitdb/') -> Tuple[List[np.nd
     beats, beat_IDs = segment_signal_relative(signal=signal, annotation=annotation)
 
     return beats, beat_IDs
-
-def uniform_sampling(beats, beat_IDs: Tuple[List[np.ndarray], List[int]], 
-                   num_samples:int = 2763) -> Tuple[List[np.ndarray], List[int]]:
-    
-    """Sample uniformly from each beat class"""
-
-    # Note the indexes of each ID
-    id_split = {0:[],1:[],2:[],3:[],4:[]}
-
-    for i in range(len(beat_IDs)):
-        id_split[beat_IDs[i]].append(i)
-
-    # Take a sample of the indexes 
-    samples = []
-    for id in id_split:
-        id_len = len(id_split[id])
-        if id_len < num_samples: # Duplicate if there are not enough in the original ID
-            id_split[id] = id_split[id] * int(np.ceil(num_samples/id_len))
-        samp = np.random.choice(id_split[id], num_samples, replace=False)
-        samples.extend(samp)
-
-    # Keep only the sampled indexes
-    beats_samp = [beats[i] for i in samples]
-    beat_IDs_samp = [beat_IDs[i] for i in samples]
-
-    return beats_samp, beat_IDs_samp
 
 def get_scalogram_from_beat(beat: np.ndarray,
                             widths: np.ndarray,
@@ -172,10 +201,10 @@ def get_scalogram_from_beat(beat: np.ndarray,
 
     return pad_scalograms(scalogram=scalogram, max_length=max_length)[0]
 
-def get_scalograms_from_signal(signal:np.ndarray, 
+def get_scalograms_from_signal(signal: np.ndarray, 
                                annotation: wfdb.Annotation,
                                widths: np.ndarray,
-                               processes:int = 2,
+                               processes: int = 2,
                                max_length: Optional[int] = None) -> Tuple[List[np.ndarray], List[int]]:
     
     """Get scalogram for all the beats in a filtered signal"""
@@ -189,7 +218,7 @@ def get_scalograms_from_signal(signal:np.ndarray,
 class ArrhythmiaDatabase(Dataset):
 
     def __init__(self, 
-                 path:str = "data/db.npz") -> None:
+                 path: str = "data/db.npz") -> None:
         super().__init__()
 
         npzfile = np.load(path, mmap_mode='r')
