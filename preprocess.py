@@ -22,8 +22,8 @@ def main():
     print("Completed data load")
 
     train_dist, test_dist = split_train_test(beat_IDs)
-    beats_train, beat_IDs_train = get_sampled_data(beats, beat_IDs, train_dist, augment=True)
-    beats_test, beat_IDs_test = get_sampled_data(beats, beat_IDs, test_dist)
+    beats_train, beat_IDs_train = get_sampled_data(beats, beat_IDs, train_dist, num_samples=2500, augment=True)
+    beats_test, beat_IDs_test = get_sampled_data(beats, beat_IDs, test_dist, num_samples=800)
     print("Completed data sampling")
 
     scalograms_train = cwt_parallel(beats=beats_train, widths=widths)
