@@ -117,8 +117,8 @@ def split_train_test(labels: List[int],
 def get_sampled_data(beats: List[np.ndarray],
                      beat_IDs: List[int],
                      dist: Dict[int, List[int]],
-                     augment: bool = False,
-                     num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
+                     num_samples: int,
+                     augment: bool = False) -> Tuple[List[np.ndarray], List[int]]:
     
     """Sample beat types to desired amount"""
 
