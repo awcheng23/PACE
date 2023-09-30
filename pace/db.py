@@ -138,7 +138,7 @@ def get_sampled_data(beats: List[np.ndarray],
 
     return beats_samp, beat_IDs_samp
 
-def pad_scalograms(scalograms: Union[list, np.ndarray], max_length: Optional[int] = None):
+def pad_scalograms(scalograms: Union[list, np.ndarray], max_length: Optional[int] = None) -> np.ndarray:
 
     """Pad scalograms to the same size"""
 
@@ -151,7 +151,7 @@ def pad_scalograms(scalograms: Union[list, np.ndarray], max_length: Optional[int
         padding = ((0,0), (0,max_length-scalograms[i].shape[1]))
         scalograms[i] = np.pad(scalograms[i], pad_width=padding, mode='constant', constant_values=0)
 
-    return scalograms
+    return np.array(scalograms)
     
 def cwt_single_beat(beat: np.ndarray, widths: np.ndarray) -> np.ndarray:
 

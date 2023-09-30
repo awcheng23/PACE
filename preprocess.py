@@ -30,13 +30,11 @@ def main():
     scalograms_test = cwt_parallel(beats=beats_test, widths=widths)
     print("Completed cwt")
 
-    largest_n = max(scalograms_train[0].shape[1], scalograms_test[0].shape[1])
-    scalograms_train = pad_scalograms(scalograms_train, max_length=largest_n)
-    scalograms_test = pad_scalograms(scalograms_test, max_length=largest_n)
+    max_length = max(max([scalogram.shape[1] for scalogram in scalograms_train]), max([scalogram.shape[1] for scalogram in scalograms_test]))
+    scalograms_train = pad_scalograms(scalograms_train, max_length=max_length)
+    scalograms_test = pad_scalograms(scalograms_test, max_length=max_length)
     print("Completed padding")
 
-    scalograms_train = np.array(scalograms_train)
-    scalograms_test = np.array(scalograms_test)
     np.savez_compressed("data/db_31_train.npz", scalograms=scalograms_train, labels=beat_IDs_train)
     np.savez_compressed("data/db_31_test.npz", scalograms=scalograms_test, labels=beat_IDs_test)
     print("Completed file save")
