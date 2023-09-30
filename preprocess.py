@@ -23,8 +23,8 @@ def main():
 
     overall_dist = get_label_distribution(beat_IDs)
     train_dist, test_dist = split_train_test(overall_dist)
-    beats_train, beat_IDs_train = hybrid_sample(train_dist)
-    beats_test, beat_IDs_test = under_sample(test_dist)
+    beats_train, beat_IDs_train = hybrid_sample(beats, beat_IDs, train_dist)
+    beats_test, beat_IDs_test = under_sample(beats, beat_IDs, test_dist)
     print("Completed data sampling")
 
     scalograms_train = cwt_parallel(beats=beats_train, widths=widths)
@@ -37,8 +37,8 @@ def main():
 
     scalograms_train = np.array(scalograms_train)
     scalograms_test = np.array(scalograms_test)
-    np.savez_compressed("data/db_train.npz", scalograms=scalograms_train, labels=beat_IDs_train)
-    np.savez_compressed("data/db_test.npz", scalograms=scalograms_test, labels=beat_IDs_test)
+    np.savez_compressed("data/db_31_train.npz", scalograms=scalograms_train, labels=beat_IDs_train)
+    np.savez_compressed("data/db_31_test.npz", scalograms=scalograms_test, labels=beat_IDs_test)
     print("Completed file save")
 
 if __name__ == '__main__':

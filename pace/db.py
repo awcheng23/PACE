@@ -124,7 +124,7 @@ def hybrid_sample(beats: List[np.ndarray],
     samples = []
     for id in dist:
         length = len(dist[id]) # use permutation to ensure each label is visited once
-        indices = np.concatenate([np.random.permutation(length) for i in range(int(np.ceil(num_samples/length)))])[:num_samples] # hybrid
+        indices = np.concatenate([np.random.permutation(length) for _ in range(int(np.ceil(num_samples/length)))])[:num_samples] # hybrid
         samples.extend(np.array(dist[id])[indices].tolist())
 
     # Keep the data and labels of the sampled indices
