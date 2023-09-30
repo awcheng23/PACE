@@ -80,7 +80,7 @@ def segment_signal_relative(signal: np.ndarray,
 
     return beats, beat_IDs
 
-def get_label_distribution(labels: List[int]) -> Dict[int, List[int]]:
+def _get_label_distribution(labels: List[int]) -> Dict[int, List[int]]:
         
     """Get the indices of where each beat type occurs"""
 
@@ -94,7 +94,7 @@ def get_label_distribution(labels: List[int]) -> Dict[int, List[int]]:
 
     return dist
 
-def split_train_test(dist: Dict[int, List[int]],
+def split_train_test(labels: List[int],
                      train_size: float = 0.8) -> Tuple[Dict[int, List[int]], Dict[int, List[int]]]:
     
     """Split the indices of the each beat type into training and testing groups"""
@@ -102,10 +102,11 @@ def split_train_test(dist: Dict[int, List[int]],
     train_dist = {}
     test_dist = {}
 
-    for id in dist:
-        data_length = len(dist[id])
+    overall_dist = _get_label_distribution(labels)
+    for id in overall_dist:
+        data_length = len(overall_dist[id])
         shuffle_order = np.random.permutation(data_length)
-        shuffled = np.array(dist[id])[shuffle_order]
+        shuffled = np.array(overall_dist[id])[shuffle_order]
 
         split = int(train_size * data_length) 
         train_dist[id] = shuffled[:split].tolist()
@@ -113,39 +114,25 @@ def split_train_test(dist: Dict[int, List[int]],
 
     return train_dist, test_dist
 
-def hybrid_sample(beats: List[np.ndarray],
-                  beat_IDs: List[int],
-                  dist: Dict[int, List[int]],
-                  num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
+def get_sampled_data(beats: List[np.ndarray],
+                     beat_IDs: List[int],
+                     dist: Dict[int, List[int]],
+                     augment: bool = False,
+                     num_samples: int = 2500) -> Tuple[List[np.ndarray], List[int]]:
     
-    """Balance the number of samples of each beat type"""
+    """Sample beat types to desired amount"""
 
     # Take a sample of the indices 
     samples = []
     for id in dist:
         length = len(dist[id]) # use permutation to ensure each label is visited once
-        indices = np.concatenate([np.random.permutation(length) for _ in range(int(np.ceil(num_samples/length)))])[:num_samples] # hybrid
+        if augment == True: # up sample minority labels
+            indices = np.concatenate([np.random.permutation(length) for _ in range(int(np.ceil(num_samples/length)))])[:num_samples] 
+        else:
+            indices = np.random.permutation(length)[:num_samples]
         samples.extend(np.array(dist[id])[indices].tolist())
 
     # Keep the data and labels of the sampled indices
-    beats_samp = [beats[i] for i in samples]
-    beat_IDs_samp = [beat_IDs[i] for i in samples]
-
-    return beats_samp, beat_IDs_samp
-
-def under_sample(beats: List[np.ndarray],
-                 beat_IDs: List[int],
-                 dist: Dict[int, List[int]],
-                 num_samples: int = 800) -> Tuple[List[np.ndarray], List[int]]:
-
-    """Cap the samples of beat types with a large number of samples"""
-
-    samples = []
-    for id in dist:
-        length = len(dist[id]) # use permutation to ensure each label is visited once
-        indices = np.random.permutation(length)[:num_samples] # under
-        samples.extend(np.array(dist[id])[indices].tolist())
-
     beats_samp = [beats[i] for i in samples]
     beat_IDs_samp = [beat_IDs[i] for i in samples]
 

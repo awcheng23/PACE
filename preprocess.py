@@ -1,5 +1,5 @@
 import numpy as np
-from pace.db import get_patients_beats, cwt_parallel, pad_scalograms, get_label_distribution, split_train_test, hybrid_sample, under_sample
+from pace.db import get_patients_beats, cwt_parallel, pad_scalograms, split_train_test, get_sampled_data
 from pace import PATIENT_IDS
 
 """
@@ -21,18 +21,18 @@ def main():
 
     print("Completed data load")
 
-    overall_dist = get_label_distribution(beat_IDs)
-    train_dist, test_dist = split_train_test(overall_dist)
-    beats_train, beat_IDs_train = hybrid_sample(beats, beat_IDs, train_dist)
-    beats_test, beat_IDs_test = under_sample(beats, beat_IDs, test_dist)
+    train_dist, test_dist = split_train_test(beat_IDs)
+    beats_train, beat_IDs_train = get_sampled_data(beats, beat_IDs, train_dist, augment=True)
+    beats_test, beat_IDs_test = get_sampled_data(beats, beat_IDs, test_dist)
     print("Completed data sampling")
 
     scalograms_train = cwt_parallel(beats=beats_train, widths=widths)
     scalograms_test = cwt_parallel(beats=beats_test, widths=widths)
     print("Completed cwt")
 
-    scalograms_train = pad_scalograms(scalograms_train)
-    scalograms_test = pad_scalograms(scalograms_test)
+    largest_n = max(scalograms_train[0].shape[1], scalograms_test[0].shape[1])
+    scalograms_train = pad_scalograms(scalograms_train, max_length=largest_n)
+    scalograms_test = pad_scalograms(scalograms_test, max_length=largest_n)
     print("Completed padding")
 
     scalograms_train = np.array(scalograms_train)
