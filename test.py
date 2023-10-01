@@ -23,7 +23,7 @@ def main():
         'trial_loss': [],
         'trial_true_label': [],
         'trial_predicted_label': [],
-        'prediction_true_positive': {},
+        'sensitivity': {},
         'predicted_probability': [],
         'trial_index': []
     }
@@ -57,7 +57,7 @@ def main():
 
     for label in np.unique(stats['trial_true_label']):
         mask = stats['trial_true_label'] == label
-        stats['prediction_true_positive'][label] = \
+        stats['sensitivity'][label] = \
             sum(np.array(stats['trial_predicted_label'])[mask] == label)/sum(mask)
 
     th.save(stats, "data/stats_2023-09-30 21_20_55.534873.pth")
