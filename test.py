@@ -23,7 +23,8 @@ def main():
         'trial_loss': [],
         'trial_true_label': [],
         'trial_predicted_label': [],
-        'prediction_true_positive': {}
+        'prediction_true_positive': {},
+        'predicted_probability': []
     }
 
     np.set_printoptions(suppress=True, formatter={'float_kind':'{:f}'.format})
@@ -45,6 +46,7 @@ def main():
         stats['trial_loss'].append(loss.item())
         stats['trial_true_label'].append(labels.item())
         stats['trial_predicted_label'].append(outputs.argmax())
+        stats['predicted_probability'].append(outputs.tolist())
 
     print('Finished Testing')
 
