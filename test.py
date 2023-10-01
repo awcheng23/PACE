@@ -24,12 +24,13 @@ def main():
         'trial_true_label': [],
         'trial_predicted_label': [],
         'prediction_true_positive': {},
-        'predicted_probability': []
+        'predicted_probability': [],
+        'trial_index': []
     }
 
     np.set_printoptions(suppress=True, formatter={'float_kind':'{:f}'.format})
     losses = []
-    for _, data in enumerate(dt, 0):
+    for i, data in enumerate(dt, 0):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
 
@@ -47,10 +48,11 @@ def main():
         stats['trial_true_label'].append(labels.item())
         stats['trial_predicted_label'].append(outputs.argmax())
         stats['predicted_probability'].append(outputs.tolist())
+        stats['trial_index'].append(i)
 
     print('Finished Testing')
 
-    stats['average prediction'] = \
+    stats['average_prediction'] = \
         sum(np.array(stats['trial_predicted_label']) == np.array(stats['trial_true_label']))/len(stats['trial_true_label'])
 
     for label in np.unique(stats['trial_true_label']):
@@ -58,7 +60,7 @@ def main():
         stats['prediction_true_positive'][label] = \
             sum(np.array(stats['trial_predicted_label'])[mask] == label)/sum(mask)
 
-    th.save(stats, "data/stats.pth")
+    th.save(stats, "data/stats_2023-09-30 21_20_55.534873.pth")
 
 if __name__ == '__main__':
     main()
