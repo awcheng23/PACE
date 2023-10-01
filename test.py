@@ -15,9 +15,16 @@ def main():
     scalo1, _ = dt[0]
     
     model = md.Pace(scalo1.size(2)).to(device=device)
-    model.load_state_dict(th.load('data/models/pace31_2023-09-30 12_39_29.540086.pth', map_location=device)['model'])
+    model.load_state_dict(th.load('data/models/pace31_2023-09-30 21_20_55.534873.pth', map_location=device)['model'])
     model.eval()
     criterion = nn.CrossEntropyLoss()
+
+    stats = {
+        'trial_loss': [],
+        'trial_true_label': [],
+        'trial_predicted_label': [],
+        'prediction_true_positive': {}
+    }
 
     np.set_printoptions(suppress=True, formatter={'float_kind':'{:f}'.format})
     losses = []
@@ -35,7 +42,21 @@ def main():
         print(f'loss: {loss.item()} true label: {labels} predicted label: {outputs.argmax()} predicted probability: {outputs}')
         losses.append(loss.item())
 
+        stats['trial_loss'].append(loss.item())
+        stats['trial_true_label'].append(labels.item())
+        stats['trial_predicted_label'].append(outputs.argmax())
+
     print('Finished Testing')
+
+    stats['average prediction'] = \
+        sum(np.array(stats['trial_predicted_label']) == np.array(stats['trial_true_label']))/len(stats['trial_true_label'])
+
+    for label in np.unique(stats['trial_true_label']):
+        mask = stats['trial_true_label'] == label
+        stats['prediction_true_positive'][label] = \
+            sum(np.array(stats['trial_predicted_label'])[mask] == label)/sum(mask)
+
+    th.save(stats, "data/stats.pth")
 
 if __name__ == '__main__':
     main()
