@@ -52,7 +52,7 @@ def main():
 
     print('Finished Testing')
 
-    stats['average_prediction'] = \
+    stats['average_accuracy'] = \
         sum(np.array(stats['trial_predicted_label']) == np.array(stats['trial_true_label']))/len(stats['trial_true_label'])
 
     for label in np.unique(stats['trial_true_label']):
